@@ -1,12 +1,15 @@
 package com.chefling.app.activities
 
 
+import android.app.ProgressDialog.show
+import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProviders
 import androidx.recyclerview.widget.DefaultItemAnimator
@@ -28,6 +31,8 @@ import com.chefling.app.utilities.Utilities
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
+import java.util.concurrent.Executors
+import java.util.concurrent.TimeUnit
 
 
 class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListener,
@@ -67,7 +72,23 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
 
     override fun onResume() {
         super.onResume()
-        syncingUpEverything()
+        if (Utilities.isNetworkAvailable(this)) {
+            val executor = Executors.newSingleThreadScheduledExecutor()
+
+            val periodicTask = Runnable {
+                // Invoke method(s) to do the work
+                syncingUpEverything()
+            }
+
+            executor.scheduleAtFixedRate(periodicTask, 0, 5, TimeUnit.MINUTES)
+
+
+        } else {
+    AlertDialog.Builder(this).setMessage("No Internet Connecton")
+                .setTitle("Warning")
+                .show()
+        }
+
     }
 
     private fun setUpListeners() {
