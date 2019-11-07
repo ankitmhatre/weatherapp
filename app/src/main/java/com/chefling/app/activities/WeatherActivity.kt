@@ -1,8 +1,6 @@
 package com.chefling.app.activities
 
 
-import android.app.ProgressDialog.show
-import android.content.DialogInterface
 import android.content.Intent
 import android.os.Bundle
 import android.util.Log
@@ -84,7 +82,7 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
 
 
         } else {
-    AlertDialog.Builder(this).setMessage("No Internet Connecton")
+            AlertDialog.Builder(this).setMessage("No Internet Connecton")
                 .setTitle("Warning")
                 .show()
         }
@@ -174,13 +172,22 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
                 if (response.body() != null) {
 
                     GlobalRepository(application).deleteAll()
-                    response.body()!!.list.forEach {
-                        GlobalRepository(application).insertForecast(
-                            Forecast(
-                                null, it.dt, it.weather[0].icon, it.main.temp_min, it.main.temp_max
 
+
+                    var tempTimeStamp = response.body()!!.list[0].dt
+                    response.body()!!.list.forEach {
+                        if (tempTimeStamp == it.dt) {
+                            GlobalRepository(application).insertForecast(
+                                Forecast(
+                                    null,
+                                    it.dt,
+                                    it.weather[0].icon,
+                                    it.main.temp_min,
+                                    it.main.temp_max
+                                )
                             )
-                        )
+                            tempTimeStamp = tempTimeStamp + 86400
+                        }
 
                     }
 

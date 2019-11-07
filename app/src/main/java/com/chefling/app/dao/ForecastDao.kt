@@ -17,7 +17,7 @@ interface ForecastDao {
     @Query("DELETE FROM Forecast")
     fun deleteAll()
 
-    @Query("SELECT * FROM Forecast")
+    @Query("SELECT * FROM Forecast ORDER BY dt DESC")
     fun getAllForecast(): LiveData<List<Forecast>>
 
 }
