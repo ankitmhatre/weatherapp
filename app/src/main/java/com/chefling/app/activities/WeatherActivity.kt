@@ -8,15 +8,23 @@ import android.view.View
 import android.widget.ImageView
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProviders
+import androidx.recyclerview.widget.DefaultItemAnimator
+import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+import coil.api.load
+import com.chefling.app.ForecastRecyclerAdapter
 import com.chefling.app.R
 import com.chefling.app.api.API
 import com.chefling.app.api.ApiInterface
 import com.chefling.app.models.Forecast
 import com.chefling.app.repository.GlobalRepository
 import com.chefling.app.response.ForecastResponse
+import com.chefling.app.response.WeatherResponse
+import com.chefling.app.ui.main.MainViewModel
 import com.chefling.app.utilities.PrefUtils
+import com.chefling.app.utilities.Utilities
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -30,21 +38,26 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
     lateinit var changeCityArrow: ImageView
     lateinit var img_name: String
     lateinit var weatherSwipeRefresh: SwipeRefreshLayout
-
+    lateinit var globalViewModel: MainViewModel
     lateinit var forecastRecyclerView: RecyclerView
 
     lateinit var minTempTv: TextView
     lateinit var tempTv: TextView
     lateinit var maxTempTv: TextView
     lateinit var weatherCondition: TextView
-
+    lateinit var forecastRecyclerAdapter: ForecastRecyclerAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
+        globalViewModel = ViewModelProviders.of(this).get(MainViewModel::class.java)
+        forecastRecyclerAdapter = ForecastRecyclerAdapter()
         setContentView(com.chefling.app.R.layout.weather_layout)
         setViewIds()
         setUpListeners()
+
+        globalViewModel.forecast.observeForever { forecasts ->
+            forecastRecyclerAdapter.update(forecasts)
+        }
 
     }
 
@@ -68,6 +81,11 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
         weatherCondition = findViewById(com.chefling.app.R.id.weatherCondition)
         changeCityArrow = findViewById(com.chefling.app.R.id.changeCityArrow)
         forecastRecyclerView = findViewById(com.chefling.app.R.id.forecastRecyclerView)
+
+        val mLayoutManager = LinearLayoutManager(this)
+        forecastRecyclerView.layoutManager = mLayoutManager
+        forecastRecyclerView.itemAnimator = DefaultItemAnimator()
+        forecastRecyclerView.adapter = forecastRecyclerAdapter
     }
 
     override fun onClick(p0: View?) {
@@ -77,43 +95,43 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
     private fun syncingUpEverything() {
         weatherSwipeRefresh.isRefreshing = true
         val apiInterface = API.getClient().create(ApiInterface::class.java)
-//        val currentWeatherResponseCall = apiInterface.getCurrentWeather(
-//            getString(com.chefling.app.R.string.openWeatherApi),
-//            PrefUtils.getString(this, "city", "")
-//        )
-//        currentWeatherResponseCall.enqueue(object : Callback<WeatherResponse> {
-//            override fun onResponse(
-//                call: Call<WeatherResponse>,
-//                response: Response<WeatherResponse>
-//            ) {
-//                if (response.body() != null) {
-//
-//                    val weatherResponse = response.body()
-//
-//                    cityName!!.text = weatherResponse!!.name
-//                    tempTv.text =
-//                        Utilities.KelvinToCelsius(weatherResponse.main.temp).toDegree()
-//                    minTempTv.text =
-//                        Utilities.KelvinToCelsius(weatherResponse.main.temp_min)
-//                            .toDegree()
-//                    maxTempTv.text =
-//                        Utilities.KelvinToCelsius(weatherResponse.main.temp_max)
-//                            .toDegree()
-//
-//
-//                    todaysWeatherIcon.load("http://openweathermap.org/img/wn/${weatherResponse.weather[0].icon}@2x.png")
-//
-//                    weatherCondition.text = weatherResponse.weather[0].main
-//                }
-//                weatherSwipeRefresh.isRefreshing = false
-//            }
-//
-//            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-//                Log.d(LOG, t.toString())
-//                weatherSwipeRefresh.isRefreshing = false
-//            }
-//        })
-//
+        val currentWeatherResponseCall = apiInterface.getCurrentWeather(
+            getString(com.chefling.app.R.string.openWeatherApi),
+            PrefUtils.getString(this, "city", "")
+        )
+        currentWeatherResponseCall.enqueue(object : Callback<WeatherResponse> {
+            override fun onResponse(
+                call: Call<WeatherResponse>,
+                response: Response<WeatherResponse>
+            ) {
+                if (response.body() != null) {
+
+                    val weatherResponse = response.body()
+
+                    cityName!!.text = weatherResponse!!.name
+                    tempTv.text =
+                        Utilities.KelvinToCelsius(weatherResponse.main.temp).toDegree()
+                    minTempTv.text =
+                        Utilities.KelvinToCelsius(weatherResponse.main.temp_min)
+                            .toDegree()
+                    maxTempTv.text =
+                        Utilities.KelvinToCelsius(weatherResponse.main.temp_max)
+                            .toDegree()
+
+
+                    todaysWeatherIcon.load("http://openweathermap.org/img/wn/${weatherResponse.weather[0].icon}@2x.png")
+
+                    weatherCondition.text = weatherResponse.weather[0].main
+                }
+                weatherSwipeRefresh.isRefreshing = false
+            }
+
+            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+                Log.d(LOG, t.toString())
+                weatherSwipeRefresh.isRefreshing = false
+            }
+        })
+
 
         val forecastResponseCall = apiInterface.getForecast(
             getString(R.string.openWeatherApi),
@@ -132,10 +150,12 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
 
                     GlobalRepository(application).deleteAll()
                     response.body()!!.list.forEach {
-                        GlobalRepository(application).insertForecast(Forecast(
-                            null, it.dt, it.weather[0].icon,  it.main.temp_min, it.main.temp_max
+                        GlobalRepository(application).insertForecast(
+                            Forecast(
+                                null, it.dt, it.weather[0].icon, it.main.temp_min, it.main.temp_max
 
-                        ))
+                            )
+                        )
 
                     }
 

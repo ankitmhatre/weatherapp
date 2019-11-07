@@ -37,9 +37,9 @@ class ForecastRecyclerAdapter :RecyclerView.Adapter<ForecastRecyclerAdapter.MyVi
         fun onItemLongClicked(position: Int): Boolean
     }
 
-    fun update(newsItems: MutableList<Forecast>) {
+    fun update(forecats: MutableList<Forecast>) {
         this.forecaseItem.clear()
-        this.forecaseItem = newsItems
+        this.forecaseItem = forecats
         notifyDataSetChanged()
     }
 
