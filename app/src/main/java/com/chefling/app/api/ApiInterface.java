@@ -1,6 +1,7 @@
 package com.chefling.app.api;
 
 
+import com.chefling.app.response.ForecastResponse;
 import com.chefling.app.response.WeatherResponse;
 
 import org.json.JSONObject;
@@ -17,7 +18,7 @@ public interface ApiInterface {
 
 
     @GET("forecast")
-    Call<JSONObject> getForecast(@Query("appid") String apiId, @Query("q") String city);
+    Call<ForecastResponse> getForecast(@Query("appid") String apiId, @Query("q") String city);
 
 
 }

@@ -10,12 +10,13 @@ import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.RecyclerView
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-import coil.api.load
+import com.chefling.app.R
 import com.chefling.app.api.API
 import com.chefling.app.api.ApiInterface
-import com.chefling.app.response.WeatherResponse
+import com.chefling.app.models.Forecast
+import com.chefling.app.repository.GlobalRepository
+import com.chefling.app.response.ForecastResponse
 import com.chefling.app.utilities.PrefUtils
-import com.chefling.app.utilities.Utilities
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -76,42 +77,73 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
     private fun syncingUpEverything() {
         weatherSwipeRefresh.isRefreshing = true
         val apiInterface = API.getClient().create(ApiInterface::class.java)
-        val contactsResponseCall = apiInterface.getCurrentWeather(
-            getString(com.chefling.app.R.string.openWeatherApi),
+//        val currentWeatherResponseCall = apiInterface.getCurrentWeather(
+//            getString(com.chefling.app.R.string.openWeatherApi),
+//            PrefUtils.getString(this, "city", "")
+//        )
+//        currentWeatherResponseCall.enqueue(object : Callback<WeatherResponse> {
+//            override fun onResponse(
+//                call: Call<WeatherResponse>,
+//                response: Response<WeatherResponse>
+//            ) {
+//                if (response.body() != null) {
+//
+//                    val weatherResponse = response.body()
+//
+//                    cityName!!.text = weatherResponse!!.name
+//                    tempTv.text =
+//                        Utilities.KelvinToCelsius(weatherResponse.main.temp).toDegree()
+//                    minTempTv.text =
+//                        Utilities.KelvinToCelsius(weatherResponse.main.temp_min)
+//                            .toDegree()
+//                    maxTempTv.text =
+//                        Utilities.KelvinToCelsius(weatherResponse.main.temp_max)
+//                            .toDegree()
+//
+//
+//                    todaysWeatherIcon.load("http://openweathermap.org/img/wn/${weatherResponse.weather[0].icon}@2x.png")
+//
+//                    weatherCondition.text = weatherResponse.weather[0].main
+//                }
+//                weatherSwipeRefresh.isRefreshing = false
+//            }
+//
+//            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
+//                Log.d(LOG, t.toString())
+//                weatherSwipeRefresh.isRefreshing = false
+//            }
+//        })
+//
+
+        val forecastResponseCall = apiInterface.getForecast(
+            getString(R.string.openWeatherApi),
             PrefUtils.getString(this, "city", "")
         )
-        contactsResponseCall.enqueue(object : Callback<WeatherResponse> {
+        forecastResponseCall.enqueue(object : Callback<ForecastResponse> {
+            override fun onFailure(call: Call<ForecastResponse>, t: Throwable) {
+                Log.d(LOG, t.toString())
+            }
+
             override fun onResponse(
-                call: Call<WeatherResponse>,
-                response: Response<WeatherResponse>
+                call: Call<ForecastResponse>,
+                response: Response<ForecastResponse>
             ) {
                 if (response.body() != null) {
 
-                    val weatherResponse = response.body()
+                    GlobalRepository(application).deleteAll()
+                    response.body()!!.list.forEach {
+                        GlobalRepository(application).insertForecast(Forecast(
+                            null, it.dt, it.weather[0].icon,  it.main.temp_min, it.main.temp_max
 
-                    cityName!!.text = weatherResponse!!.name
-                    tempTv.text =
-                        Utilities.KelvinToCelsius(weatherResponse.main.temp).toDegree()
-                    minTempTv.text =
-                        Utilities.KelvinToCelsius(weatherResponse.main.temp_min)
-                            .toDegree()
-                    maxTempTv.text =
-                        Utilities.KelvinToCelsius(weatherResponse.main.temp_max)
-                            .toDegree()
+                        ))
 
+                    }
 
-                    todaysWeatherIcon.load("http://openweathermap.org/img/wn/${weatherResponse.weather[0].icon}@2x.png")
-
-                    weatherCondition.text = weatherResponse.weather[0].main
                 }
-                weatherSwipeRefresh.isRefreshing = false
-            }
 
-            override fun onFailure(call: Call<WeatherResponse>, t: Throwable) {
-                Log.d(LOG, t.toString())
-                weatherSwipeRefresh.isRefreshing = false
             }
         })
+
 
     }
 

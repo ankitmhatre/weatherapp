@@ -8,6 +8,7 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.sqlite.db.SupportSQLiteDatabase;
 
+import com.chefling.app.dao.ForecastDao;
 import com.chefling.app.models.Forecast;
 
 @Database(entities = {Forecast.class}, version = 1, exportSchema = false)
@@ -33,4 +34,6 @@ public abstract class GlobalDatabase extends RoomDatabase{
         }
         return instance;
     }
+
+    public abstract ForecastDao forecastDao();
 }

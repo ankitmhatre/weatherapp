@@ -7,7 +7,7 @@ import com.google.gson.annotations.SerializedName
 @Entity
 data class Forecast(
     @PrimaryKey(autoGenerate = true)
-    var id: Int,
+    var id: Int? = null,
     @SerializedName("dt")
     var dt: Long,
     @SerializedName("icon")
