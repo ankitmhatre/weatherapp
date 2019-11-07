@@ -57,6 +57,10 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
 
         globalViewModel.forecast.observeForever { forecasts ->
             forecastRecyclerAdapter.update(forecasts)
+            try {
+                forecastRecyclerView.scrollToPosition(0)
+            } catch (e: Exception) {
+            }
         }
 
     }

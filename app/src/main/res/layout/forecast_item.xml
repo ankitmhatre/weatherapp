@@ -2,7 +2,7 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="72dp"
     android:layout_height="136dp"
-
+android:padding="3dp"
     android:orientation="vertical">
 
     <TextView
@@ -12,7 +12,7 @@
         android:gravity="center"
         android:text="Day"
         android:textColor="@color/white"
-        android:textSize="22sp" />
+        android:textSize="10sp" />
 
     <ImageView
         android:id="@+id/weatherIconRv"
@@ -26,6 +26,7 @@
         android:layout_weight="0.4"
         android:maxLines="1"
         android:text="10/24"
+        android:textSize="8sp"
         android:gravity="center"
         android:textColor="@color/white" />
 
