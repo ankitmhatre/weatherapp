@@ -1,6 +1,8 @@
 package com.chefling.app.utilities;
 
 import java.text.DecimalFormat;
+import java.util.Calendar;
+import java.util.Locale;
 
 public class Utilities {
     public static String getIconUrl(String iconName) {
@@ -13,5 +15,11 @@ public class Utilities {
         DecimalFormat df = new DecimalFormat();
         df.setMaximumFractionDigits(2);
         return df.format(inCelsius);
+    }
+    public static String getDay(long timestamp) {
+        Calendar c = Calendar.getInstance();
+        c.setTimeInMillis(timestamp * 1000);
+
+        return c.getDisplayName((Calendar.DAY_OF_WEEK), Calendar.LONG, Locale.getDefault());
     }
 }

@@ -10,6 +10,10 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import coil.api.load
 import com.chefling.app.models.Forecast
+import com.chefling.app.utilities.Utilities
+import okhttp3.internal.Util
+import java.util.*
+import kotlin.collections.ArrayList
 
 class ForecastRecyclerAdapter :RecyclerView.Adapter<ForecastRecyclerAdapter.MyViewHolder>() {
 
@@ -52,9 +56,8 @@ class ForecastRecyclerAdapter :RecyclerView.Adapter<ForecastRecyclerAdapter.MyVi
 
     override fun onBindViewHolder(holder: MyViewHolder, position: Int) {
 
-        holder.day.text = forecaseItem[position].dt.toString()
-        holder.temp.text = "${forecaseItem[position].temp_min}/${forecaseItem[position].temp_max}"
-
+        holder.day.text = Utilities.getDay(forecaseItem[position].dt)
+        holder.temp.text = "${Utilities.KelvinToCelsius(forecaseItem[position].temp_min)}/${Utilities.KelvinToCelsius(forecaseItem[position].temp_max)}"
 
 
 

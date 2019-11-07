@@ -30,8 +30,8 @@
                     android:layout_height="match_parent"
                     android:layout_centerInParent="true"
                     android:layout_gravity="center"
-android:paddingEnd="20dp"
                     android:maxLines="1"
+                    android:paddingEnd="20dp"
                     android:text="..."
                     android:textColor="@color/white"
                     android:textSize="36sp" />
@@ -79,8 +79,8 @@ android:paddingEnd="20dp"
                     android:layout_weight="0.4"
                     android:gravity="end"
                     android:maxLines="1"
-                    android:text="@string/empty_string"
                     android:paddingEnd="@dimen/min_max_temp"
+                    android:text="@string/empty_string"
                     android:textColor="@color/white"
                     android:textSize="@dimen/min_max_temp" />
 
@@ -122,9 +122,11 @@ android:paddingEnd="20dp"
                 android:background="#ccc" />
 
             <androidx.recyclerview.widget.RecyclerView
-                android:layout_width="match_parent"
                 android:id="@+id/forecastRecyclerView"
-                android:layout_height="match_parent" />
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:paddingStart="@dimen/min_max_temp"
+                android:paddingEnd="@dimen/min_max_temp" />
 
 
         </LinearLayout>

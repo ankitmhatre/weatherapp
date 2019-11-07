@@ -82,7 +82,7 @@ class WeatherActivity : AppCompatActivity(), SwipeRefreshLayout.OnRefreshListene
         changeCityArrow = findViewById(com.chefling.app.R.id.changeCityArrow)
         forecastRecyclerView = findViewById(com.chefling.app.R.id.forecastRecyclerView)
 
-        val mLayoutManager = LinearLayoutManager(this)
+        val mLayoutManager = LinearLayoutManager(this, LinearLayoutManager.HORIZONTAL, true)
         forecastRecyclerView.layoutManager = mLayoutManager
         forecastRecyclerView.itemAnimator = DefaultItemAnimator()
         forecastRecyclerView.adapter = forecastRecyclerAdapter
